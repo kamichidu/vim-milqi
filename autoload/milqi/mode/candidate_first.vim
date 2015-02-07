@@ -36,6 +36,16 @@ function! s:refresh_candidates() dict
 endfunction
 let s:milqi.refresh_candidates= function('s:refresh_candidates')
 
+function! s:refresh_statusline() dict
+    let &l:statusline= printf('--- milqi --- (%s) --- (%d/%d) --- %s',
+    \   self.__define.name,
+    \   len(self.__shown_candidates),
+    \   len(self.__candidates),
+    \   (self.__done ? 'Finished' : 'Executing...')
+    \)
+endfunction
+let s:milqi.refresh_statusline= function('s:refresh_statusline')
+
 function! milqi#mode#candidate_first#init(define, context)
     let milqi= deepcopy(s:milqi)
 

@@ -47,17 +47,22 @@ function! s:open_buffer() dict
         \   'range': 'tabpage',
         \})
     endif
-    call s:milqi_buffer.open('---milqi--- (' . self.__define.name . ')')
+    call s:milqi_buffer.open('--- milqi ---')
 endfunction
 
 function! s:init_buffer() dict
     let b:milqi= self
+
+    let max_size= get(self.__define, 'max_size', 20)
+    execute 'resize' max_size
 
     setlocal nobuflisted buftype=nofile bufhidden=unload
     setlocal nonumber norelativenumber
     setlocal filetype=milqi
 
     setlocal cursorline
+
+    let self.__bufvar= b:
 endfunction
 
 function! s:init_variable() dict
@@ -68,10 +73,15 @@ function! s:refresh() dict
     try
         call self.refresh_candidates()
 
-        let candidates= self.filter(self.__context, self.__candidates)
+        let max_size= get(self.__define, 'max_size', 20)
+        let candidates= reverse(copy(self.filter(self.__context, self.__candidates)))[ : (max_size - 1)]
+        let self.__shown_candidates= candidates
+
+        execute 'resize' max([len(self.__shown_candidates), 1])
+        call self.refresh_statusline()
 
         %delete _
-        call setline(1, reverse(map(copy(candidates), 'self.format_candidate(v:val)')))
+        call setline(1, map(copy(candidates), 'self.format_candidate(v:val)'))
 
         let self.__mappings= {}
         let lnum= 1
@@ -89,16 +99,28 @@ function! s:refresh_candidates() dict
     throw 'milqi: No implementation given.'
 endfunction
 
+function! s:refresh_statusline() dict
+    let &l:statusline= printf('--- milqi --- (%s) --- (%d/%d)',
+    \   self.__define.name,
+    \   len(self.__shown_candidates),
+    \   len(self.__candidates)
+    \)
+endfunction
+
 function! s:filter(context, candidates) dict
     let candidates= map(copy(a:candidates), '[v:val, self.get_abbr(v:val)]')
 
     for pattern in split(self.__input, '\s\+')
-        if pattern =~# '^!'
-            let pattern= strpart(pattern, 1)
-            call filter(candidates, 'v:val[1] !~# pattern')
-        else
-            call filter(candidates, 'v:val[1] =~# pattern')
-        endif
+        try
+            if pattern =~# '^!'
+                let pattern= strpart(pattern, 1)
+                call filter(candidates, 'v:val[1] !~ pattern')
+            else
+                call filter(candidates, 'v:val[1] =~ pattern')
+            endif
+        catch /E\(51\|53\|54\|55\|56\|57\|58\|59\|60\|61\|62\|63\|64\|65\|68\|69\|70\|71\|76\|369\|383\|386\|476\|486\|554\|678\|769\|864\|865\|866\|867\|868\|869\|870\|871\|872\|873\|874\|875\|876\|877\|878\|888\):/
+            " ignore
+        endtry
     endfor
 
     return map(candidates, 'v:val[0]')
@@ -145,6 +167,7 @@ function! milqi#mode#base#new()
     \   'init_variable': function('s:init_variable'),
     \   'refresh': function('s:refresh'),
     \   'refresh_candidates': function('s:refresh_candidates'),
+    \   'refresh_statusline': function('s:refresh_statusline'),
     \   'filter': function('s:filter'),
     \   'format_candidate': function('s:format_candidate'),
     \   'accept': function('s:accept'),

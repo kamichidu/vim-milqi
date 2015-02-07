@@ -26,7 +26,7 @@ let s:milqi= milqi#mode#base#new()
 
 function! s:refresh_candidates() dict
     if has_key(self.__define, 'lazy_init')
-        let response= self.__define.lazy_init(self.__context, self.current_input())
+        let response= self.__define.lazy_init(self.__context, self.__input)
         if response.reset
             let self.__candidates= response.candidates
         else

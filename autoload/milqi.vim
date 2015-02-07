@@ -22,6 +22,10 @@
 let s:save_cpo= &cpo
 set cpo&vim
 
+function! milqi#version()
+    return '0.0.0'
+endfunction
+
 function! milqi#candidate_first(define, ...)
     call milqi#mode#candidate_first#init(a:define, get(a:000, 0, {}))
 endfunction
@@ -33,6 +37,9 @@ endfunction
 function! milqi#exit()
     if has_key(b:, 'milqi')
         call b:milqi.exit()
+    endif
+    if has_key(b:, 'ui')
+        call b:ui.stop()
     endif
 endfunction
 

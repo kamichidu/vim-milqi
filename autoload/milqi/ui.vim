@@ -124,12 +124,21 @@ function! s:start() dict abort
         endwhile
 
         call self.__handler.exit()
+        if exists('b:ui') && b:ui is self
+            call s:PrtExit()
+        endif
     finally
         let &t_ve= save_t_ve
     endtry
 endfunction
 
 let s:ui.start= function('s:start')
+
+function! s:stop()
+    call s:PrtExit()
+endfunction
+
+let s:ui.stop= function('s:stop')
 
 function! milqi#ui#start(handler) abort
     let ui= deepcopy(s:ui)
@@ -173,6 +182,8 @@ function! s:PrtHistory(n)
 endfunction
 
 function! s:AcceptSelection(mode)
+    let b:ui.__finish= 1
+
     if a:mode ==# 'e'
         call b:ui.__handler.accept()
     elseif a:mode ==# 'h'
