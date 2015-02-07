@@ -90,7 +90,7 @@ function! s:start() dict abort
         call self.__handler.refresh()
 
         while !self.__finish
-            echo
+            echo ''
             echohl Comment | echon '>>> ' |
             \   echohl Comment | echon join(self.__input.left_part(), '') |
             \   echohl Cursor  | echon join(self.__input.cursor_part(), '') |
@@ -250,6 +250,7 @@ function! s:PrtExit()
     let b:ui.__finish= 1
     noautocmd call s:close()
     noautocmd wincmd p
+    echo ''
 endfunction
 
 function! s:close()
