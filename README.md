@@ -2,51 +2,47 @@ milqi - MILd Query Interaction
 ========================================================================================================================
 This plugin is under development.
 
-How To Create Your Source
+
+Abstract
+------------------------------------------------------------------------------------------------------------------------
+milqi has 2 modes, query-first and candidate-first.
+milqi is inspired [ctrlp](kien/ctrlp.vim) and [unite](Shougo/unite.vim).
+
+How To Create Your Extension
 ------------------------------------------------------------------------------------------------------------------------
 * Create your milqi-extension definition
 
     The definition is just a Dictionary.
 
-    Common required attributes:
-
-    * name
+    * name - Required
 
         The name of milqi-extension.
 
-    * init(context)
+    * init(context) - Required
 
         This attribute is a Funcref, and returns a List.
 
         See [candidate notation](#candidate-notation).
 
-    Required attributes if it's candidate first:
-
-    * enter(context)
-
-        It is called when entered to milqi buffer.
-
     * exit(context)
 
-    * accept(context, id)
+    * accept(context, candidate) - Required
 
-    * get_abbr(context, id)
+    * get_abbr(context, candidate)
 
-    * lazy_init(context, query)
+    * lazy_init(context, query) - Optional for query-first mode
 
-        This attribute is a Funcref, and returns a Dictionary which has 2 attributes.
+        This attribute is a Funcref, and returns a Dictionary which has attributes below:
 
-            reset - 1/0
-            candidates - []
+            * reset - 1/0
+            * candidates - []
 
-        This was called only if context.is_async is true.
+    * async_init(context) - Optional for candidate-first mode
 
-    * async_init(context)
+        This attribute is a Funcref, and returns a Dictionary which has attributes below:
 
-        This attribute is a Funcref, and returns a Dictionary which has 2 attributes.
-
-            done - 1/0
-            candidates - []
+            * done - 1/0
+            * candidates - []
 
 Interaction mode
 ------------------------------------------------------------------------------------------------------------------------
@@ -58,14 +54,8 @@ Interaction mode
 
     init() and async_init()
 
-<a name="candidate-notation">Candidate Notation</a>
-------------------------------------------------------------------------------------------------------------------------
-A candidate is a Dictionary, it has attributes below:
-
-* id
-
-    It is any data type.
 
 <a name="context-notation">Context Notation</a>
 ------------------------------------------------------------------------------------------------------------------------
 A context is a Dictionary, it has no attributes.
+You can use this Dictionary for any-purpose.
