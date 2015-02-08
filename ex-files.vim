@@ -12,7 +12,7 @@ function! s:define.init(context)
     if has('win32')
         let self.__proc= vimproc#popen2('DIR /S /B /A:A')
     else
-        let self.__proc= vimproc#popen2('find -type f -a -not -regex "\.git"')
+        let self.__proc= vimproc#popen2('find . -type f -a -not -regex ''.*\.git.*''')
     endif
     return []
 endfunction
@@ -31,7 +31,7 @@ function! s:define.async_init(context)
         let files= self.__proc.stdout.read_lines()
         return {
         \   'done': 0,
-        \   'candidates': files,
+        \   'candidates': map(files, 'fnamemodify(v:val, ":.")'),
         \}
     catch
         echoerr v:exception
