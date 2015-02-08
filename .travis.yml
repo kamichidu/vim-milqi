@@ -1,0 +1,6 @@
+language: generic
+
+before_script:
+  - git clone https://github.com/thinca/vim-themis $TEMP/themis/
+
+script: $TEMP/themis/bin/themis --recursive
